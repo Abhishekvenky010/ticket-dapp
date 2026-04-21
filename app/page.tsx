@@ -1,4 +1,5 @@
 "use client";
+import MintTicket from "@/components/MintTicket";
 import WalletButton from "@/components/WalletButton";
 export default function Home(){
   return(
@@ -8,6 +9,7 @@ export default function Home(){
       </h1>
 
       <WalletButton />
+      <MintTicket/>
     </div>
   );
   }
