@@ -1,6 +1,7 @@
 "use client";
 import MintTicket from "@/components/MintTicket";
 import WalletButton from "@/components/WalletButton";
+import MyTickets from "@/components/MyTickets";
 export default function Home(){
   return(
     <div className="min-h-screen flex flex-col items-center justify-center bg-brown-100">
@@ -10,6 +11,7 @@ export default function Home(){
 
       <WalletButton />
       <MintTicket/>
+      <MyTickets />
     </div>
   );
   }

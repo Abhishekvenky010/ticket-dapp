@@ -1,42 +1,26 @@
 "use client";
 
 import { useWallet } from "@solana/wallet-adapter-react";
-import { connection } from "../lib/solana";
-import {
-  PublicKey,
-  SystemProgram,
-  Transaction,
-  LAMPORTS_PER_SOL,
-} from "@solana/web3.js";
+import { mintNFT } from "../lib/mintNFT";
 
 export default function MintTicket() {
-  const { publicKey, sendTransaction } = useWallet();
+  const wallet = useWallet();
 
   const handleMint = async () => {
-    if (!publicKey) {
+    if (!wallet.publicKey) {
       alert("Connect wallet first");
       return;
     }
 
     try {
-      // For now: simple SOL transfer (acts like demo "mint")
-      const transaction = new Transaction().add(
-        SystemProgram.transfer({
-          fromPubkey: publicKey,
-          toPubkey: new PublicKey(publicKey), // self-transfer
-          lamports: 0.01 * LAMPORTS_PER_SOL,
-        })
-      );
+      const nft = await mintNFT(wallet);
 
-      const signature = await sendTransaction(transaction, connection);
+      console.log("NFT:", nft);
 
-      await connection.confirmTransaction(signature, "confirmed");
-
-      alert("🎉 Ticket Minted (Demo)");
-      console.log("Transaction:", signature);
+      alert("🎉 Ticket NFT Minted!");
     } catch (err) {
       console.error(err);
-      alert("Error minting ticket");
+      alert("Error minting NFT");
     }
   };
 
@@ -45,7 +29,7 @@ export default function MintTicket() {
       onClick={handleMint}
       className="bg-purple-600 text-white px-6 py-2 rounded-lg mt-4 hover:bg-purple-700"
     >
-      Mint Ticket 🎟️
+      Mint Ticket NFT 🎟️
     </button>
   );
 }
