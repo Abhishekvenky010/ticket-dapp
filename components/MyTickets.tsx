@@ -14,6 +14,7 @@ export default function MyTickets() {
   const [tickets, setTickets] = useState<NFT[]>([]);
   const [loading, setLoading] = useState(false);
   const [listingPrices, setListingPrices] = useState<{[key: string]: string}>({});
+  const [maxResalePrices, setMaxResalePrices] = useState<{[key: string]: string}>({});).
 
   useEffect(() => {
     const fetchNFTs = async () => {
@@ -111,6 +112,12 @@ export default function MyTickets() {
               onClick={() => handleList(t)}
               className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
             >
+              <input
+              type="number"
+              step="0.01"
+              placeholder="Max Resale Price in SOL (optional)"
+              value={maxResalePrices[t.address ? t.address.toString() : ""] || ""}>
+              </input>
               List
             </button>
           </div>

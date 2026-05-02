@@ -5,6 +5,7 @@ const ListingSchema = new mongoose.Schema({
   name: { type: String, required: true },     // Ticket name (e.g., "Concert Ticket")
   price: { type: Number, required: true },    // Price in SOL (lamports for precision)
   seller: { type: String, required: true },   // Seller's wallet public key
+  maxResalePrice: { type: Number, default: null },  // Optional max resale price
   createdAt: { type: Date, default: Date.now },
 });
 

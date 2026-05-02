@@ -23,6 +23,12 @@ export default function Marketplace() {
     }
 
     try {
+      // Check max resale price
+      if (item.maxResalePrice && item.price > item.maxResalePrice) {
+        alert(`❌ Price exceeds max resale limit of ${item.maxResalePrice} SOL`);
+        return;
+      }
+
       // 1. Check balance
       const balance = await connection.getBalance(wallet.publicKey);
       const priceLamports = item.price * 1_000_000_000; // convert SOL → lamports
