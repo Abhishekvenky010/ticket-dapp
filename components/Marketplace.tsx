@@ -6,9 +6,21 @@ import { connection } from "../lib/solana";
 import { buyTicket } from "../lib/buyTicket";
 import { transferNFT } from "../lib/transferNFT";
 
+type Listing = {
+  _id: string;
+  nftMint: string;
+  name: string;
+  description?: string;
+  imageUrl?: string;
+  price: number;
+  seller: string;
+  maxResalePrice?: number | null;
+};
+
 export default function Marketplace() {
   const wallet = useWallet();
-  const [listings, setListings] = useState<any[]>([]);
+  const [listings, setListings] = useState<Listing[]>([]);
+  const [buying, setBuying] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/api/listings")
@@ -16,12 +28,13 @@ export default function Marketplace() {
       .then(setListings);
   }, []);
 
-  const handleBuy = async (item: any) => {
+  const handleBuy = async (item: Listing) => {
     if (!wallet.publicKey) {
       alert("Connect wallet first");
       return;
     }
 
+    setBuying(item._id);
     try {
       // Check max resale price
       if (item.maxResalePrice && item.price > item.maxResalePrice) {
@@ -52,6 +65,8 @@ export default function Marketplace() {
     } catch (err) {
       console.error(err);
       alert("❌ Error during purchase");
+    } finally {
+      setBuying(null);
     }
   };
 
@@ -63,14 +78,17 @@ export default function Marketplace() {
 
       {listings.map((item, i) => (
         <div key={i} className="bg-white p-4 rounded-xl shadow-md mb-3">
+          {item.imageUrl && <img src={item.imageUrl} alt={item.name} className="w-full h-32 object-cover rounded mb-2" />}
           <h3 className="font-semibold">{item.name}</h3>
+          {item.description && <p className="text-sm text-gray-600">{item.description}</p>}
           <p className="text-green-600 font-bold">{item.price} SOL</p>
 
           <button
             onClick={() => handleBuy(item)}
-            className="bg-green-500 text-white px-3 py-1 mt-2 rounded hover:bg-green-600"
+            disabled={buying === item._id}
+            className="bg-green-500 text-white px-3 py-1 mt-2 rounded hover:bg-green-600 disabled:opacity-50"
           >
-            Buy
+            {buying === item._id ? "Buying..." : "Buy"}
           </button>
         </div>
       ))}
