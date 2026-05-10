@@ -3,13 +3,16 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import WalletButton from "./WalletButton";
+import { useTheme } from "./ThemeProvider";
 
 export default function Header() {
   const pathname = usePathname();
+  const { theme, toggleTheme } = useTheme();
 
   const navItems = [
     { href: "/", label: "Home", icon: "🏠" },
     { href: "/marketplace", label: "Marketplace", icon: "🛒" },
+    { href: "/auctions", label: "Auctions", icon: "🏆" },
     { href: "/my-nfts", label: "My NFTs", icon: "🎟️" },
     { href: "/mint", label: "Mint NFT", icon: "✨" },
   ];
@@ -54,8 +57,15 @@ export default function Header() {
             ))}
           </nav>
 
-          {/* Wallet Button */}
-          <div className="flex items-center">
+          {/* Theme Toggle & Wallet Button */}
+          <div className="flex items-center space-x-4">
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+            >
+              {theme === 'light' ? '🌙' : '☀️'}
+            </button>
             <WalletButton />
           </div>
         </div>

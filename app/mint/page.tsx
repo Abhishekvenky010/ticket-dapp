@@ -175,7 +175,7 @@ export default function MintPage() {
 
     } catch (err) {
       console.error("Minting error:", err);
-      alert(`❌ Error minting NFT: ${err.message || "Please try again."}`);
+      alert(`❌ Error minting NFT: ${err instanceof Error ? err.message : "Please try again."}`);
     } finally {
       setLoading(false);
     }
@@ -185,14 +185,14 @@ export default function MintPage() {
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Mint New NFT Ticket</h1>
-        <p className="text-gray-600">Create and mint your event ticket as an NFT</p>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Mint New NFT Ticket</h1>
+        <p className="text-gray-600 dark:text-gray-300">Create and mint your event ticket as an NFT</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Mint Form */}
-        <div className="bg-white rounded-xl shadow-sm border p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-6">Ticket Details</h2>
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">Ticket Details</h2>
 
           <div className="space-y-4">
             {/* Event Name */}
@@ -206,7 +206,7 @@ export default function MintPage() {
                 value={formData.eventName}
                 onChange={handleInputChange}
                 placeholder="e.g., Summer Music Festival 2024"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent"
                 required
               />
             </div>
@@ -222,7 +222,7 @@ export default function MintPage() {
                 onChange={handleInputChange}
                 placeholder="Describe your event..."
                 rows={3}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent"
                 required
               />
             </div>
@@ -237,7 +237,7 @@ export default function MintPage() {
                 name="eventDate"
                 value={formData.eventDate}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent"
               />
             </div>
 
@@ -252,7 +252,7 @@ export default function MintPage() {
                 value={formData.eventLocation}
                 onChange={handleInputChange}
                 placeholder="e.g., Central Park, New York"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent"
               />
             </div>
 
@@ -265,7 +265,7 @@ export default function MintPage() {
                 name="ticketType"
                 value={formData.ticketType}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent"
               >
                 <option value="General Admission">General Admission</option>
                 <option value="VIP">VIP</option>
@@ -288,7 +288,7 @@ export default function MintPage() {
                 step="0.01"
                 min="0"
                 placeholder="0.00"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent"
                 required
               />
               <p className="text-xs text-gray-500 mt-1">
@@ -309,7 +309,7 @@ export default function MintPage() {
                 step="0.01"
                 min="0"
                 placeholder="Optional"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent"
               />
               <p className="text-xs text-gray-500 mt-1">
                 Maximum price buyers can resell for (optional)
@@ -325,7 +325,7 @@ export default function MintPage() {
                 type="file"
                 accept="image/*"
                 onChange={handleImageChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-500 focus:border-transparent file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-50 dark:file:bg-purple-900 file:text-purple-700 dark:file:text-purple-300 hover:file:bg-purple-100 dark:hover:file:bg-purple-800"
                 required
               />
             </div>
@@ -349,8 +349,8 @@ export default function MintPage() {
         </div>
 
         {/* Preview */}
-        <div className="bg-white rounded-xl shadow-sm border p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-6">Preview</h2>
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">Preview</h2>
 
           <div className="bg-gray-50 rounded-lg p-4">
             {imagePreview ? (
@@ -371,7 +371,7 @@ export default function MintPage() {
               <h3 className="font-semibold text-lg">
                 {formData.eventName || "Event Name"}
               </h3>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-600 dark:text-gray-300">
                 {formData.eventDescription || "Event description will appear here..."}
               </p>
               <div className="flex items-center justify-between text-sm">

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { getNFTs } from "../lib/getNFTs";
+import { transferNFT } from "../lib/transferNFT";
 
 type NFT = {
   name?: string;
@@ -15,6 +16,8 @@ export default function MyTickets() {
   const [loading, setLoading] = useState(false);
   const [listingPrices, setListingPrices] = useState<{[key: string]: string}>({});
   const [maxResalePrices, setMaxResalePrices] = useState<{[key: string]: string}>({});
+  const [transferAddresses, setTransferAddresses] = useState<{[key: string]: string}>({});
+  const [transferLoading, setTransferLoading] = useState<{[key: string]: boolean}>({});
   const [metadata, setMetadata] = useState<{[key: string]: {name?: string, description?: string, image?: string}}>({});
 
   const fetchMetadata = async (uri: string): Promise<{name?: string, description?: string, image?: string}> => {
@@ -79,33 +82,33 @@ export default function MyTickets() {
     }
   };
 
-  useEffect(() => {
-    const fetchNFTs = async () => {
-      if (!wallet.publicKey) return;
+  const fetchNFTs = async () => {
+    if (!wallet.publicKey) return;
 
-      setLoading(true);
-      try {
-        const data = await getNFTs(wallet);
-        setTickets(data || []);
-        // Fetch metadata for each NFT
-        const meta: {[key: string]: {name?: string, description?: string, image?: string}} = {};
-        for (const ticket of data || []) {
-          if (ticket.uri) {
-            try {
-              meta[ticket.address?.toString() || ''] = await fetchMetadata(ticket.uri);
-            } catch (err) {
-              console.error('Error fetching metadata:', err);
-            }
+    setLoading(true);
+    try {
+      const data = await getNFTs(wallet);
+      setTickets(data || []);
+      // Fetch metadata for each NFT
+      const meta: {[key: string]: {name?: string, description?: string, image?: string}} = {};
+      for (const ticket of data || []) {
+        if (ticket.uri) {
+          try {
+            meta[ticket.address?.toString() || ''] = await fetchMetadata(ticket.uri);
+          } catch (err) {
+            console.error('Error fetching metadata:', err);
           }
         }
-        setMetadata(meta);
-      } catch (err) {
-        console.error("Error fetching NFTs:", err);
-      } finally {
-        setLoading(false);
       }
-    };
+      setMetadata(meta);
+    } catch (err) {
+      console.error("Error fetching NFTs:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchNFTs();
   }, [wallet]);
 
@@ -141,6 +144,30 @@ export default function MyTickets() {
     }
   };
 
+  const handleTransfer = async (ticket: NFT) => {
+    const recipientAddress = transferAddresses[ticket.address ? ticket.address.toString() : ""];
+    if (!recipientAddress || recipientAddress.trim() === "") {
+      alert("Please enter a recipient address");
+      return;
+    }
+
+    const nftAddress = ticket.address ? ticket.address.toString() : "";
+    setTransferLoading(prev => ({ ...prev, [nftAddress]: true }));
+
+    try {
+      await transferNFT(wallet, nftAddress, recipientAddress);
+      alert("✅ NFT transferred successfully!");
+      setTransferAddresses(prev => ({ ...prev, [nftAddress]: "" }));
+      // Refresh the NFT list
+      fetchNFTs();
+    } catch (err) {
+      console.error(err);
+      alert("❌ Error transferring NFT: " + (err instanceof Error ? err.message : "Unknown error"));
+    } finally {
+      setTransferLoading(prev => ({ ...prev, [nftAddress]: false }));
+    }
+  };
+
   if (!wallet.publicKey) {
     return (
       <p className="mt-6 text-gray-600">
@@ -168,7 +195,7 @@ export default function MyTickets() {
         return (
         <div
           key={i}
-          className="bg-white p-4 rounded-xl shadow-md mb-3"
+          className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-md mb-3"
         >
           {meta?.image && <img src={meta.image} alt={t.name} className="w-full h-32 object-cover rounded mb-2" />}
           <h3 className="font-semibold text-lg">
@@ -206,6 +233,24 @@ export default function MyTickets() {
               className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
             >
               List
+            </button>
+          </div>
+
+          <div className="mt-2 flex flex-col gap-2">
+            <input
+              type="text"
+              placeholder="Recipient wallet address"
+              value={transferAddresses[t.address ? t.address.toString() : ""] || ""}
+              onChange={(e) => setTransferAddresses(prev => ({ ...prev, [t.address ? t.address.toString() : ""]: e.target.value }))}
+              className="px-2 py-1 border rounded text-sm"
+              disabled={transferLoading[t.address ? t.address.toString() : ""]}
+            />
+            <button
+              onClick={() => handleTransfer(t)}
+              disabled={transferLoading[t.address ? t.address.toString() : ""]}
+              className="bg-orange-500 text-white px-3 py-1 rounded hover:bg-orange-600 disabled:opacity-50"
+            >
+              {transferLoading[t.address ? t.address.toString() : ""] ? "Transferring..." : "Transfer"}
             </button>
           </div>
         </div>

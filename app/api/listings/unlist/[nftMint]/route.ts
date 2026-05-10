@@ -1,9 +1,11 @@
 import Listing from "@/models/listings";
 import { connectDB } from "@/lib/db";
 
-export async function DELETE(req: Request, { params }: { params: { nftMint: string } }) {
+export async function DELETE(req: Request, { params }: { params: Promise<{ nftMint: string }> }) {
   try {
     await connectDB();
+
+    const resolvedParams = await params;
 
     // Find and delete listing by NFT mint address and seller
     const url = new URL(req.url);
@@ -14,7 +16,7 @@ export async function DELETE(req: Request, { params }: { params: { nftMint: stri
     }
 
     const deletedListing = await Listing.findOneAndDelete({
-      nftMint: params.nftMint,
+      nftMint: resolvedParams.nftMint,
       seller: seller
     });
 

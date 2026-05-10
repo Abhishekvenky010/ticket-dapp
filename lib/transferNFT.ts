@@ -40,7 +40,7 @@ export const transferNFT = async (
                 throw new Error(`NFT mint account ${mintAddress} does not exist on the current network (devnet). The NFT may have been minted on a different network or the minting failed.`);
             }
         } catch (error) {
-            if (error.message.includes('does not exist')) {
+            if (error instanceof Error && error.message.includes('does not exist')) {
                 throw error;
             }
             // If it's a different error, continue and try to find the NFT
@@ -53,7 +53,7 @@ export const transferNFT = async (
                 mintAddress: mintPublicKey
             });
         } catch (error) {
-            if (error.message.includes('AccountNotFoundError') || error.message.includes('not found')) {
+            if (error instanceof Error && (error.message.includes('AccountNotFoundError') || error.message.includes('not found'))) {
                 throw new Error(`NFT metadata not found for mint address ${mintAddress}. This NFT may not exist on the current network (devnet) or may not be a valid Metaplex NFT.`);
             }
             throw error;
