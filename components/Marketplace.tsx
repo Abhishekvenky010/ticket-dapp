@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { connection } from "../lib/solana";
 import { buyTicket } from "../lib/buyTicket";
-import { transferNFT } from "../lib/transferNFT";
 
 type Listing = {
   _id: string;
@@ -24,9 +23,35 @@ export default function Marketplace() {
 
   useEffect(() => {
     fetch("/api/listings")
-      .then((res) => res.json())
-      .then(setListings);
+      .then((res) => {
+        if (!res.ok) {
+          console.error("Failed to fetch listings:", res.status, res.statusText);
+          return [];
+        }
+        return res.json();
+      })
+      .then(setListings)
+      .catch((error) => {
+        console.error("Error fetching listings:", error);
+        setListings([]);
+      });
   }, []);
+
+  const handleUnlist = async (item: Listing) => {
+    if (!wallet.publicKey || item.seller !== wallet.publicKey.toString()) {
+      alert("You can only unlist your own listings");
+      return;
+    }
+
+    try {
+      await fetch(`/api/listings/${item._id}`, { method: "DELETE" });
+      alert("✅ Listing removed successfully!");
+      setListings(listings.filter(l => l._id !== item._id));
+    } catch (err) {
+      console.error(err);
+      alert("❌ Error removing listing");
+    }
+  };
 
   const handleBuy = async (item: Listing) => {
     if (!wallet.publicKey) {
@@ -54,13 +79,10 @@ export default function Marketplace() {
       // 2. Transfer SOL to seller
       await buyTicket(wallet, item.seller, priceLamports);
 
-      // 3. Transfer NFT to buyer
-      await transferNFT(wallet, item.nftMint, wallet.publicKey.toString());
-
-      // 4. Delete listing from DB
+      // 3. Delete listing from DB (seller will transfer NFT manually)
       await fetch(`/api/listings/${item._id}`, { method: "DELETE" });
 
-      alert("✅ Purchase successful!");
+      alert("✅ Payment successful! The seller will transfer the NFT to you shortly.");
       setListings(listings.filter(l => l._id !== item._id));
     } catch (err) {
       console.error(err);
@@ -76,22 +98,39 @@ export default function Marketplace() {
         Marketplace 🛒
       </h2>
 
-      {listings.map((item, i) => (
-        <div key={i} className="bg-white p-4 rounded-xl shadow-md mb-3">
-          {item.imageUrl && <img src={item.imageUrl} alt={item.name} className="w-full h-32 object-cover rounded mb-2" />}
-          <h3 className="font-semibold">{item.name}</h3>
-          {item.description && <p className="text-sm text-gray-600">{item.description}</p>}
-          <p className="text-green-600 font-bold">{item.price} SOL</p>
+      {listings.map((item, i) => {
+        const isOwnListing = wallet.publicKey && item.seller === wallet.publicKey.toString();
+        const isBuying = buying === item._id;
 
-          <button
-            onClick={() => handleBuy(item)}
-            disabled={buying === item._id}
-            className="bg-green-500 text-white px-3 py-1 mt-2 rounded hover:bg-green-600 disabled:opacity-50"
-          >
-            {buying === item._id ? "Buying..." : "Buy"}
-          </button>
-        </div>
-      ))}
+        return (
+          <div key={i} className="bg-white p-4 rounded-xl shadow-md mb-3">
+            {item.imageUrl && <img src={item.imageUrl} alt={item.name} className="w-full h-32 object-cover rounded mb-2" />}
+            <h3 className="font-semibold">{item.name}</h3>
+            {item.description && <p className="text-sm text-gray-600">{item.description}</p>}
+            <p className="text-green-600 font-bold">{item.price} SOL</p>
+            {isOwnListing && (
+              <p className="text-xs text-blue-600 font-medium">Your listing</p>
+            )}
+
+            {isOwnListing ? (
+              <button
+                onClick={() => handleUnlist(item)}
+                className="bg-red-500 text-white px-3 py-1 mt-2 rounded hover:bg-red-600"
+              >
+                Unlist
+              </button>
+            ) : (
+              <button
+                onClick={() => handleBuy(item)}
+                disabled={isBuying}
+                className="bg-green-500 text-white px-3 py-1 mt-2 rounded hover:bg-green-600 disabled:opacity-50"
+              >
+                {isBuying ? "Buying..." : "Buy"}
+              </button>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }

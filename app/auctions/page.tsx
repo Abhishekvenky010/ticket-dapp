@@ -33,10 +33,16 @@ export default function AuctionsPage() {
   const fetchAuctions = async () => {
     try {
       const res = await fetch("/api/auctions");
+      if (!res.ok) {
+        console.error("Failed to fetch auctions:", res.status, res.statusText);
+        setAuctions([]);
+        return;
+      }
       const data = await res.json();
       setAuctions(data);
     } catch (error) {
       console.error("Error fetching auctions:", error);
+      setAuctions([]);
     } finally {
       setLoading(false);
     }

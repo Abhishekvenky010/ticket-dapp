@@ -21,7 +21,6 @@ export const connectDB = async () => {
     console.log('MongoDB connected successfully');
   } catch (error) {
     console.error('MongoDB connection error:', error);
-    // Don't throw error, just log it for development
-    console.warn('Continuing without MongoDB - some features may not work');
+    throw new Error('Failed to connect to MongoDB');
   }
 };

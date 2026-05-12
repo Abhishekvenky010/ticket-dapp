@@ -5,7 +5,6 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import { PublicKey } from "@solana/web3.js";
 import { connection } from "../../lib/solana";
 import { buyTicket } from "../../lib/buyTicket";
-import { transferNFT } from "../../lib/transferNFT";
 
 type Listing = {
   _id: string;
@@ -30,6 +29,11 @@ export default function MarketplacePage() {
   const fetchListings = async () => {
     try {
       const res = await fetch("/api/listings");
+      if (!res.ok) {
+        console.error("Failed to fetch listings:", res.status, res.statusText);
+        setListings([]);
+        return;
+      }
       const data = await res.json();
 
       // Validate listings - check if NFTs exist on current network
@@ -117,13 +121,10 @@ export default function MarketplacePage() {
       // Transfer SOL to seller
       await buyTicket(wallet, item.seller, priceLamports);
 
-      // Transfer NFT to buyer
-      await transferNFT(wallet, item.nftMint, wallet.publicKey.toString());
-
-      // Delete listing from DB
+      // Delete listing from DB (seller will transfer NFT manually)
       await fetch(`/api/listings/${item._id}`, { method: "DELETE" });
 
-      alert("✅ Purchase successful!");
+      alert("✅ Payment successful! The seller will transfer the NFT to you shortly.");
       setListings(listings.filter(l => l._id !== item._id));
     } catch (err) {
       console.error(err);

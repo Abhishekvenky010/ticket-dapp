@@ -1,4 +1,5 @@
 import "./globals.css";
+import "@solana/wallet-adapter-react-ui/styles.css";
 import WalletContextProvider from "@/components/WalletProvider";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import Header from "@/components/Header";
